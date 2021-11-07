@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+        <!-- 设置匿名访问资源 -->
+        <security:http security="none" pattern="/js/**"/>
+        <security:http security="none" pattern="/css/**"/>
+        <security:http security="none" pattern="/login.html"/>
+
+
+        <!-- 扫描主键 -->
+        <context:component-scan base-package="com.yyq"/>
+
+        <bean id="bCryptPasswordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" />
+
+        <!--
+            1.auto-config="true":开启自动配置 由SpringSecurity提供登录页面，提供登录的url地址，
+            退出的url地址
+            2.use-expressions="true"：使用表达式的方式控制权限
+            3.security:intercept-url：定义哪些链接不可以放行，需要当前角色和权限才能放行
+                3.1. pattern="/**"：要求系统中的所有资源，都必须通过角色和权限才能访问
+                3.2. access：指定角色和权限
+
+         -->
+        <security:http auto-config="true" use-expressions="true">
+            <!-- 表示必须认证之后才能访问 -->
+            <security:intercept-url pattern="/a.html" access="isAuthenticated()"/>
+            <!-- 必须拥有delete权限才能访问 -->
+            <security:intercept-url pattern="/b.html" access="hasAuthority('delete')"/>
+            <!-- 必须拥有ROLE_ABC角色才能访问 -->
+            <security:intercept-url pattern="/c.html" access="hasAuthority('ROLE_ABC')"/>
+<!--
+            <security:intercept-url pattern="/hello.do" access="hasAuthority('ROLE_ABC')"/>
+-->
+            <security:intercept-url pattern="/**" access="hasRole('ROLE_ADMIN')" />
+
+            <!--
+                login-page:设置自定义登录页面
+                username-parameter:设置登录页面中表单里面表示用户名的表单项的name属性值
+                password-parameter:设置登录页面中表单里面表示密码的表单项的name属性值
+                login-processing-url:处理登录功能的路径
+                default-target-url:登录成功跳转页面
+                authentication-failure-url:登录失败跳转页面
+                always-use-default-target:总是在登录成功情况下，
+                    跳转到default-target-url所设置的页面
+            -->
+            <security:form-login login-page="/login.html"
+                                 username-parameter="username"
+                                 password-parameter="password"
+                                 login-processing-url="/login.do"
+                                 default-target-url="/index.html"
+                                 authentication-failure-url="/login.html"
+                                 always-use-default-target="true"/>
+
+            <!--
+            csrf：对应CsrfFilter过滤器
+            disabled：是否启用CsrfFilter过滤器，如果使用自定义登录页面需要关闭此项，否则登录操作会被禁用（403）
+            -->
+            <security:csrf disabled="true"></security:csrf>
+            <!-- 退出登录 invalidate-session清空session -->
+            <security:logout logout-url="/logout.do" logout-success-url="/login.html" invalidate-session="true"/>
+
+        </security:http>
+
+
+
+    <!--
+          ③ 认证管理：定义登录账号和密码，并授予当前用户访问的角色或权限
+            （1）：将用户名和密码：当前用户具有的角色，写死到配置文件中（现在:入门）
+                    security:user name="admin" :登录名
+                    authorities="ROLE_ADMIN"   ：角色(ROLE_ADMIN),权限
+                    password="admin"          ：密码
+             （2）：用户名和密码，当前用户具有的角色，从数据库中查询
+        -->
+    <security:authentication-manager>
+        <security:authentication-provider user-service-ref="userService">
+            <!-- 设置密码加密 -->
+        <security:password-encoder ref="bCryptPasswordEncoder"/>
+            <!--<security:user-service>
+                &lt;!&ndash;
+                     name:表示认证信息用户名
+                     password:表示认证信息的密码,{noop}表示不使用密码加密
+                     authorities:表示该用户所拥有的权限及角色
+                 &ndash;&gt;
+                <security:user name="admin"
+                               authorities="ROLE_ADMIN"
+                               password="{noop}admin"></security:user>
+            </security:user-service>-->
+
+
+        </security:authentication-provider>
+    </security:authentication-manager>
+
+    <!--开启注解方式权限控制-->
+    <security:global-method-security pre-post-annotations="enabled" />
+
+
+</beans>

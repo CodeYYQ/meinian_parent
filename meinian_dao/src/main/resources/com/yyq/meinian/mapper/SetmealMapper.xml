@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yyq.meinian.mapper.SetmealMapper">
+
+    <insert id="addSetmeal" useGeneratedKeys="true" keyProperty="id">
+        insert into t_setmeal values
+        (
+            null,
+            #{name},
+            #{code},
+            #{helpCode},
+            #{sex},
+            #{age},
+            #{price},
+            #{remark},
+            #{attention},
+            #{img}
+        )
+    </insert>
+    <insert id="addSetmealAndTravelGroup">
+        insert into t_setmeal_travelgroup values
+        <foreach collection="travelGroupIds" item="travelGroupId" separator=",">
+            (
+            #{id},#{travelGroupId}
+            )
+        </foreach>
+    </insert>
+    <select id="findSetmealByQueryString" resultType="Setmeal">
+        select * from t_setmeal
+        <where>
+            <if test="queryString != null and queryString !=''">
+                code = #{queryString} or helpCode = #{queryString} or
+                name like '%'#{queryString}'%'
+            </if>
+        </where>
+    </select>
+    <select id="findAllSetmeal" resultType="Setmeal">
+        select * from t_setmeal
+    </select>
+    
+    
+    <resultMap id="setmealResultMap" type="Setmeal">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="code" column="code"/>
+        <result property="helpCode" column="helpCode"/>
+        <result property="sex" column="sex"/>
+        <result property="age" column="age"/>
+        <result property="price" column="price"/>
+        <result property="remark" column="remark"/>
+        <result property="attention" column="attention"/>
+        <result property="img" column="img"/>
+        <collection property="travelGroups"
+                    select="com.yyq.meinian.mapper.TravelGroupMapper.findTravelGroupsBySetmealIdStep"
+                    column="id"/>
+    </resultMap>
+    
+    <select id="findSetmealByIdStep" resultMap="setmealResultMap">
+        select * from t_setmeal where id =#{id}
+    </select>
+    <select id="getSetmealReport" resultType="Map">
+        SELECT t_setmeal.name name,COUNT(NAME) value FROM t_order
+            LEFT JOIN t_setmeal
+        ON t_order.setmeal_id = t_setmeal.id
+        GROUP BY NAME
+    </select>
+
+    <select id="getHotSetmeal" resultType="map">
+        SELECT
+            t_setmeal.name name,
+            COUNT(NAME) setmeal_count,
+            COUNT(NAME)/(SELECT COUNT(*) FROM t_order) proportion
+        FROM t_order
+                 LEFT JOIN t_setmeal
+                           ON t_order.setmeal_id = t_setmeal.id
+        GROUP BY name
+        ORDER BY setmeal_count DESC
+            LIMIT 2
+    </select>
+</mapper>

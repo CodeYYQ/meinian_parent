@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yyq.meinian.mapper.OrderMapper">
+
+    <select id="findCountByCondition" resultType="int">
+        select count(*) from t_order
+        where member_id =#{memberId}
+        and orderDate =#{orderDate}
+        and setmeal_id=#{setmealId}
+    </select>
+    <update id="updateReservationsByOrderDate">
+        update t_ordersetting set reservations=#{reservations}
+        where orderDate=#{orderDate}
+    </update>
+    <insert id="addOrder" useGeneratedKeys="true" keyProperty="id">
+        insert into t_order values
+            (
+                 null,
+                 #{memberId},
+                 #{orderDate},
+                 #{orderType},
+                 #{orderStatus},
+                 #{setmealId}
+            )
+    </insert>
+    <select id="findById" resultType="Map">
+        select
+            t_member.name member,
+            t_setmeal.name setmeal,
+            orderDate,orderType
+        from t_order
+        left join t_member
+        on t_order.member_id=t_member.id
+        left join t_setmeal on
+        t_setmeal.id=t_order.setmeal_id
+        where t_order.id=#{id}
+    </select>
+
+    <select id="getTodayOrderNumber" resultType="int">
+        select count(*) from t_order where orderDate = #{orderDate}
+    </select>
+
+    <select id="getTodayVisitsNumber" resultType="int">
+        select count(*) from t_order where orderDate = #{orderDate} and orderStatus = '已出游'
+    </select>
+
+    <select id="getThisWeekOrMonthOrderNumber" resultType="int">
+        select count(*) from t_order where orderDate between #{startDate} and #{endDate}
+    </select>
+
+    <select id="getThisWeekOrMonthVisitsNumber" resultType="int">
+        select count(*) from t_order where orderDate between #{startDate} and #{endDate} and orderStatus = '已出游'
+    </select>
+
+</mapper>

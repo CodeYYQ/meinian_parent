@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yyq.meinian.mapper.TravelGroupMapper">
+
+
+    <insert id="addTravelGroup" useGeneratedKeys="true" keyProperty="id">
+        insert into t_travelgroup values
+        (
+             null,
+             #{code},
+             #{name},
+             #{helpCode},
+             #{sex},
+             #{remark},
+             #{attention}
+        )
+    </insert>
+    <insert id="addTravelGroupAndTravelItem">
+        insert into t_travelgroup_travelitem values
+        <foreach collection="travelItemIds" item="travelItemId" separator=",">
+            (#{travelGroupId},#{travelItemId})
+        </foreach>
+    </insert>
+    <select id="findTravelGroupByQueryString" resultType="TravelGroup">
+        select * from t_travelgroup
+        <where>
+            <if test="queryString != null and queryString != ''">
+                code = #{queryString} or
+                helpCode = #{queryString} or
+                name like "%"#{queryString}"%"
+            </if>
+        </where>
+    </select>
+    <delete id="deleteTravelGroup">
+        delete from t_travelgroup
+        where id = #{id}
+    </delete>
+    <delete id="deleteTravelGroupItem">
+        delete from t_travelgroup_travelitem
+        where travelgroup_id = #{travelGroupId}
+    </delete>
+
+    <select id="getTravelItemByTravelGroupId" resultType="Integer">
+        select travelitem_id from t_travelgroup_travelitem
+        where travelgroup_id = #{id}
+    </select>
+    <update id="updateTravelGroup">
+        update t_travelgroup set
+        code =#{code},
+        name =#{name},
+        helpCode =#{helpCode},
+        sex =#{sex},
+        remark =#{remark},
+        attention =#{attention}
+        where id = #{id}
+    </update>
+    <select id="findAll" resultType="TravelGroup">
+        select * from  t_travelgroup
+    </select>
+
+    <resultMap id="traverGroupMap" type="TravelGroup">
+        <id property="id" column="id"/>
+        <result property="code" column="code"/>
+        <result property="name" column="name"/>
+        <result property="helpCode" column="helpCode"/>
+        <result property="sex" column="sex"/>
+        <result property="remark" column="remark"/>
+        <result property="attention" column="attention"/>
+        <collection property="travelItems"
+                    select="com.yyq.meinian.mapper.TravelItemMapper.findTravelItemsByTravelGroupIdStep"
+                    column="id"/>
+    </resultMap>
+
+    <select id="findTravelGroupsBySetmealIdStep" resultMap="traverGroupMap">
+        select t_travelgroup.* from t_setmeal_travelgroup left join t_travelgroup
+        on t_setmeal_travelgroup.travelgroup_id=t_travelgroup.id
+        where t_setmeal_travelgroup.setmeal_id = #{setmealId}
+    </select>
+</mapper>

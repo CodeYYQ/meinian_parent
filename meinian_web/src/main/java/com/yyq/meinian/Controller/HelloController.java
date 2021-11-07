@@ -1,0 +1,25 @@
+package com.yyq.meinian.Controller;
+
+import com.alibaba.dubbo.config.annotation.Reference;
+import com.yyq.meinian.service.HelloService;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * @title: HelloController
+ * @Author yyq
+ * @Date: 2021/10/27 20:00
+ * @Version 1.0
+ */
+@RestController
+public class HelloController {
+    @Reference
+    private HelloService helloService;
+
+    @RequestMapping(value = "/hello")
+    public String sayHello(String name){
+        return helloService.sayHello(name);
+    }
+
+
+}

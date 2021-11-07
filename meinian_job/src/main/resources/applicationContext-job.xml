@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+
+    <context:component-scan base-package="com.yyq.meinian.job"/>
+
+    <!-- 设置工作 -->
+    <bean id="jobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <!-- 设置工作对象 -->
+        <property name="targetObject" ref="clearImgJob" />
+        <!-- 设置具体执行的工作方法 -->
+        <property name="targetMethod" value="clearImg"/>
+    </bean>
+
+    <!-- 设置触发器 -->
+    <bean id="cronTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <!-- 设置具体工作详情 -->
+        <property name="jobDetail" ref="jobDetail"/>
+        <!-- 设置cron表达式 -->
+        <property name="cronExpression" value="0 0 1 * * ? "/>
+    </bean>
+
+    <!-- 设置调度容器 -->
+    <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <!-- 设置触发器 -->
+        <property name="triggers">
+            <array>
+                <ref bean="cronTrigger"/>
+            </array>
+        </property>
+    </bean>
+
+</beans>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yyq.meinian.mapper.TravelItemMapper">
+
+
+    <insert id="addTravelItem">
+        insert into t_travelitem values
+            (
+                    null,
+                    #{code},
+                    #{name},
+                    #{sex},
+                    #{age},
+                    #{price},
+                    #{type},
+                    #{remark},
+                    #{attention}
+            )
+    </insert>
+    <select id="findTravelItemByQueryString" resultType="TravelItem">
+        select * from t_travelItem
+        <where>
+            <if test="queryString != null and queryString != ''">
+                code = #{queryString} or
+                name like "%"#{queryString}"%"
+            </if>
+        </where>
+    </select>
+    <delete id="deleteTravelItem">
+        delete  from t_travelItem where id = #{id}
+    </delete>
+
+    <update id="updateTravelItem">
+        update t_travelItem set
+            code=#{code},
+            name=#{name},
+            sex=#{sex},
+            age=#{age},
+            price=#{price},
+            type=#{type},
+            remark=#{remark},
+            attention=#{attention}
+        where id = #{id}
+    </update>
+    <select id="findAll" resultType="TravelItem">
+        select * from t_travelItem;
+    </select>
+    <select id="findTravelItemsByTravelGroupIdStep" resultType="TravelItem">
+        select t_travelitem.*
+            from t_travelgroup_travelitem
+        left join t_travelitem
+            on t_travelgroup_travelitem.travelitem_id
+            = t_travelitem.id
+        where t_travelgroup_travelitem.travelgroup_id=#{travelGroupId}
+
+    </select>
+</mapper>

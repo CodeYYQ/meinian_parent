@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style type="text/css">
+        html{height:100%}
+        body{height:100%;margin:0px;padding:0px}
+        #container{height:100%}
+    </style>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=3.0&ak=AK4Bco4qDEOVrdZP6SBn55ovdOyt9W8F"></script>
+</head>
+<body>
+<div id="container"></div>
+</body>
+<script type="text/javascript">
+    //初始化地图对象
+    var map = new BMap.Map("container");
+    //设置一个坐标点(116.404,39.915-->天安门)
+    var point = new BMap.Point(116.404,39.915);
+    //初始化地图
+    map.centerAndZoom(point, 15);
+    //通过鼠标滚轮缩放
+    map.enableScrollWheelZoom(true);
+    // 创建标注
+    var marker = new BMap.Marker(point);
+    // 将标注添加到地图中
+    map.addOverlay(marker);
+    //为标注添加点击事件
+    /*marker.addEventListener("click", function(){
+        alert("您点击了标注");
+    });*/
+    //设置标注可以拖动
+    marker.enableDragging();
+    //为标注添加拖拽事件
+    marker.addEventListener("dragend", function(e){
+        alert("当前位置：" + e.point.lng + ", " + e.point.lat);
+    });
+    var opts = {
+        width : 250,     // 信息窗口宽度
+        height: 100,     // 信息窗口高度
+        title : "Hello"  // 信息窗口标题
+    };
+    var infoWindow = new BMap.InfoWindow("World", opts);  // 创建信息窗口对象
+    map.openInfoWindow(infoWindow, map.getCenter());      // 打开信息窗口
+</script>
+</html>
