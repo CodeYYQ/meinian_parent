@@ -23,6 +23,7 @@ public class HelloController {
         System.out.println("master");
         System.out.println("host-fix");
         System.out.println("hhhh");
+        System.out.println("hhhh2");
         return helloService.sayHello(name);
     }
 
