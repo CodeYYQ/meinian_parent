@@ -20,6 +20,7 @@ public class HelloController {
     public String sayHello(String name){
         System.out.println("name = " + name);
         System.out.println("hot-fix");
+        System.out.println("master");
         return helloService.sayHello(name);
     }
 
