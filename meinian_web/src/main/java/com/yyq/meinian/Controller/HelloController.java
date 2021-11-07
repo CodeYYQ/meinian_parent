@@ -19,6 +19,7 @@ public class HelloController {
     @RequestMapping(value = "/hello")
     public String sayHello(String name){
         System.out.println("name = " + name);
+        System.out.println("hot-fix");
         return helloService.sayHello(name);
     }
 
