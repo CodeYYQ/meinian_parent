@@ -21,6 +21,7 @@ public class HelloController {
         System.out.println("name = " + name);
         System.out.println("hot-fix");
         System.out.println("master");
+        System.out.println("host-fix");
         return helloService.sayHello(name);
     }
 
