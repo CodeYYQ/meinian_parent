@@ -25,6 +25,7 @@ public class HelloController {
         System.out.println("hhhh");
         System.out.println("hhhh2");
         System.out.println("hhhh2");
+        System.out.println("垃圾");
         return helloService.sayHello(name);
     }
 
